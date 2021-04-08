@@ -1,14 +1,15 @@
-using System;
+//using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
+using System;
 
 public class GameController : MonoBehaviour
 {
     public static GameController instance;
-    [SerializeField] float scoreMultiplier;
+    [SerializeField] int scoreMultiplier;
     int flag =0;//first cube has touched or not
 
     public TextMeshProUGUI timerText;
@@ -19,7 +20,7 @@ public class GameController : MonoBehaviour
 
     public GameObject winCanvas;
     bool timeAdded;
-    public float score;
+    public int score;
     float currentTimer;
 
     public string CURRENT_TAG;    
@@ -36,26 +37,26 @@ public class GameController : MonoBehaviour
         {
             if (scoreMultiplier == 0)
             {
-                score += newScoreValue * 1;
                 scoreMultiplier = 1;
+                score += newScoreValue * 1;
                 StartCoroutine("ComboTimerCountDown");
             }
             if (scoreMultiplier == 1)
             {
-                score += newScoreValue * scoreMultiplier;
                 scoreMultiplier = 2;
+                score += newScoreValue * scoreMultiplier;
                 StartCoroutine("ComboTimerCountDown");
             }
             else if (scoreMultiplier == 2)
             {
-                score += newScoreValue * scoreMultiplier;
                 scoreMultiplier = 3;
+                score += newScoreValue * scoreMultiplier;
                 StopCoroutine("ComboTimerCountDown");
             }
             else if (scoreMultiplier >= 3)
             {
-                score += newScoreValue * scoreMultiplier;
                 scoreMultiplier = 4;
+                score += newScoreValue * scoreMultiplier;
                 StopCoroutine("ComboTimerCountDown");
             }
             UpdateScore();
@@ -63,10 +64,10 @@ public class GameController : MonoBehaviour
         }
         else
         {
-            scoreMultiplier = 1;
-            score += newScoreValue * scoreMultiplier;
+            scoreMultiplier = 0;
+            score += newScoreValue * 1;
             StartCoroutine("ComboTimerCountDown");
-            
+            UpdateScore();
             CURRENT_TAG = tag;
         }
 
@@ -80,7 +81,7 @@ public class GameController : MonoBehaviour
     IEnumerator ComboTimerCountDown()
     {
         yield return new WaitForSeconds(10);
-        scoreMultiplier = 1;
+        scoreMultiplier = 0;
     }
 
     IEnumerator LoadLevelAfterTime(int levelIndex)
@@ -89,12 +90,15 @@ public class GameController : MonoBehaviour
         SceneManager.LoadScene(levelIndex);
     }
 
+   
+
 
 
     // Start is called before the first frame update
     void Start()
     {
         Time.timeScale = 1;
+        
         if(SceneManager.GetActiveScene().buildIndex == 0) //i.e if splash Screen
         {
             StartCoroutine(LoadLevelAfterTime(1));
@@ -124,17 +128,17 @@ public class GameController : MonoBehaviour
     {
         CountdownTimer();
 
+
+
         if (scoreMultiplier > 1)
         {
             scoreMultiplierText.gameObject.SetActive(true);
             scoreMultiplierText.text = "x" + scoreMultiplier.ToString();
         }
-        else
+        else if (scoreMultiplier == 0)
         {
             scoreMultiplierText.gameObject.SetActive(false);
         }
-
-
 
         if (Input.GetKey(KeyCode.R))
         {
@@ -157,6 +161,8 @@ public class GameController : MonoBehaviour
             scoreMultiplierText.gameObject.SetActive(false);
             StartCoroutine(LoadLevelAfterTime(1));
             Player.instance.controlsEnabled = false;
+
+            SetScore();
                 
             
         }
@@ -169,6 +175,17 @@ public class GameController : MonoBehaviour
             scoreText.gameObject.SetActive(false);
             Player.instance.controlsEnabled = false;
             StartCoroutine(LoadLevelAfterTime(1));
+
+            SetScore();
+        }
+    }
+
+    private void SetScore()
+    {
+        if(PlayerPrefs.GetInt("score",0) < score)
+        {
+            PlayerPrefs.SetInt("score", score);
+
         }
     }
 

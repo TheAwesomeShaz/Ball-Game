@@ -27,8 +27,11 @@ public class Player : MonoBehaviour
     {
         if (controlsEnabled)
         {
-            dirX = -(joyStick.Vertical * moveSpeed * Time.deltaTime);
-            dirZ = joyStick.Horizontal * moveSpeed * Time.deltaTime;
+            //dirX = -(joyStick.Vertical * moveSpeed * Time.deltaTime);
+            //dirZ = joyStick.Horizontal * moveSpeed * Time.deltaTime;
+
+            dirX = -(Input.GetAxis("Vertical") * moveSpeed * Time.deltaTime);
+            dirZ = Input.GetAxis("Horizontal") * moveSpeed * Time.deltaTime;
 
             Vector3 moveForce = new Vector3(dirX, 0, dirZ);
             rb.AddForce(moveForce,ForceMode.Force);
